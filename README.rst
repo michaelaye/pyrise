@@ -57,7 +57,7 @@ HiRISE Tools
 
 Tools to work with MRO's HiRISE camera data.
 
-* Free software: BSD license
+* Free software: ISC license
 
 Installation
 ============
