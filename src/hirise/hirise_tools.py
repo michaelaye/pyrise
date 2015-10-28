@@ -1,10 +1,22 @@
-from pathlib import Path
-import numpy as np
-from os.path import join as pjoin
+from urllib.parse import urlunparse
 from urllib.request import urlretrieve
-from urllib.parse import urlparse, urlunparse
+
+import numpy as np
+from pathlib import Path
+from urllib.error import HTTPError
+
 mosaic_extensions = '.cal.norm.map.equ.mos.cub'
 # mosaic_extensions = '.cal.des.map.cub'
+
+
+def hirise_dropbox():
+    home = Path.home()
+    return home / 'Dropbox' / 'data' / 'hirise'
+
+
+def labels_root():
+    dropbox = hirise_dropbox()
+    return dropbox / 'labels'
 
 
 class OBSERVATION_ID(object):
@@ -234,6 +246,19 @@ class HiRISE_URL(object):
                            self.params, self.query, self.fragment])
 
 
+def get_rdr_label(obsid):
+    prodid = PRODUCT_ID(obsid)
+    prodid.color = 'RED'
+    url = HiRISE_URL(prodid.s)
+    savepath = labels_root() / Path(prodid.label_fname)
+    savepath.parent.mkdir(exist_ok=True)
+    print("Downloading\n", url.rdr_labelurl, 'to\n', savepath)
+    try:
+        urlretrieve(url.rdr_labelurl, savepath)
+    except HTTPError as e:
+        print(e)
+
+
 def get_color_from_path(path):
     basename = HiRISE_Basename(path)
     return basename.prodid.color
@@ -245,8 +270,7 @@ def get_obsid_from_path(path):
 
 
 def rebin(a, newshape):
-    '''Rebin an array to a new shape.
-    '''
+    """Rebin an array to a new shape."""
     assert len(a.shape) == len(newshape)
 
     slices = [slice(0, old, float(old) / new) for old, new in zip(a.shape, newshape)]
