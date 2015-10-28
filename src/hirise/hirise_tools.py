@@ -61,7 +61,7 @@ class OBSERVATION_ID(object):
         return self.__str__()
 
     @property
-    def obsid(self):
+    def s(self):
         return self.__str__()
 
     def get_upper_orbit_folder(self):
@@ -73,22 +73,24 @@ class OBSERVATION_ID(object):
         return "_".join(["ORB", str(lower).zfill(6), str(lower + 99).zfill(6)])
 
 
-class PRODUCT_ID(OBSERVATION_ID):
+class PRODUCT_ID(object):
     # ESP_012345_1234_RED
 
     colors = ['RED', 'BG', 'IR']
-    ccdnumbers = dict(RED=range(10), IR=[10, 11], BG=[12, 13])
 
     def __init__(self, initstr=None):
         if initstr is not None:
             tokens = initstr.split('_')
-            super().__init__('_'.join(tokens[:3]))
+            self.obsid = OBSERVATION_ID('_'.join(tokens[:3]))
             try:
-                self._color = tokens[3]
+                self.color = tokens[3]
             except IndexError:
                 self._color = None
         else:
             self._color = None
+
+    def _set_and_check_color(self, value):
+        self._color = value
 
     @property
     def color(self):
@@ -101,17 +103,17 @@ class PRODUCT_ID(OBSERVATION_ID):
         self._color = value
 
     def __str__(self):
-        return "{}_{}".format(super().__str__(), self.color)
+        return "{}_{}".format(self.obsid, self.color)
 
     def __repr__(self):
         return self.__str__()
 
     @property
-    def pid(self):
+    def s(self):
         return self.__str__()
 
 
-class SOURCE_PRODUCT_ID(PRODUCT_ID):
+class SOURCE_PRODUCT_ID(object):
 
     red_ccds = ['RED'+str(i) for i in range(10)]
     ir_ccds = ['IR10', 'IR11']
@@ -122,17 +124,17 @@ class SOURCE_PRODUCT_ID(PRODUCT_ID):
         if sprodid is not None:
             tokens = sprodid.split('_')
             obsid = '_'.join(tokens[:3])
-            self._ccd = tokens[3]
-            color, ccdno = self._parse_colorccdno(tokens[3])
-            prodid = '_'.join([obsid, color])
-            super().__init__(prodid)
-            self._channel = tokens[4]
-
+            ccd = tokens[3]
+            color, ccdno = self._parse_ccd(ccd)
+            self.prodid = PRODUCT_ID('_'.join([obsid, color]))
+            self.ccd = ccd
+            self.channel = tokens[4]
         else:
-            super().__init__(None)
+            self.prodid = None
             self._channel = None
+            self._ccd = None
 
-    def _parse_colorccdno(self, value):
+    def _parse_ccd(self, value):
         sep = 2 if value[:2] in PRODUCT_ID.colors else 3
         return value[:sep], value[sep:]
 
@@ -148,16 +150,32 @@ class SOURCE_PRODUCT_ID(PRODUCT_ID):
 
     @property
     def ccd(self):
-        return str(self._ccd)
+        return self._ccd
 
     @ccd.setter
     def ccd(self, value):
         if value not in self.ccds:
             raise ValueError("CCD value must be in {}.".format(self.ccds))
         self._ccd = value
+        self.prodid.color = self.color
+
+    @property
+    def color(self):
+        return self._parse_ccd(self.ccd)[0]
+
+    @property
+    def ccdno(self):
+        offset = len(self.color)
+        return self.ccd[offset:]
 
     def __str__(self):
-        return "{}{}_{}".format(super().__str__()[:-3], self.ccd, self.channel)
+        return "{}{}_{}".format(self.prodid, self.ccdno, self.channel)
+
+    def __repr__(self):
+        return self.__str__()
+
+    def s(self):
+        return self.__str__()
 
 
 class HiRISE_Basename(object):
