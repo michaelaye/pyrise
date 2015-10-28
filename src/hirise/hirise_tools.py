@@ -112,6 +112,10 @@ class PRODUCT_ID(object):
     def s(self):
         return self.__str__()
 
+    @property
+    def jp2_fname(self):
+        return self.s + '.JP2'
+
 
 class SOURCE_PRODUCT_ID(object):
 
@@ -174,15 +178,19 @@ class SOURCE_PRODUCT_ID(object):
     def __repr__(self):
         return self.__str__()
 
+    @property
     def s(self):
         return self.__str__()
+
+    @property
+    def fname(self):
+        return self.s + '.IMG'
 
 
 class HiRISE_Basename(object):
 
     def __init__(self, basename):
-        self.obsid = HiRISE_Obsid(obsid[15])
-        self.color = basename
+        pass
 
 
 class HiRISE_Path(object):
