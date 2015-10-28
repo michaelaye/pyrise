@@ -2,20 +2,9 @@ from pathlib import Path
 import numpy as np
 from os.path import join as pjoin
 from urllib.request import urlretrieve
-
+from urllib.parse import urlparse, urlunparse
 mosaic_extensions = '.cal.norm.map.equ.mos.cub'
 # mosaic_extensions = '.cal.des.map.cub'
-
-
-class Coordinates:
-    path = ''
-    obsID = 0
-    sample = 0
-    line = 0
-    latitude = 0
-    longitude = 0
-    x = 0
-    y = 0
 
 
 class OBSERVATION_ID(object):
@@ -69,8 +58,15 @@ class OBSERVATION_ID(object):
         get the upper folder name where the given orbit folder is residing on the
         hisync server
         '''
-        lower = self.orbit // 100 * 100
+        lower = int(self.orbit) // 100 * 100
         return "_".join(["ORB", str(lower).zfill(6), str(lower + 99).zfill(6)])
+
+    @property
+    def storage_path_stem(self):
+        s = "{phase}/{orbitfolder}/{obsid}".format(phase=self.phase,
+                                                   orbitfolder=self.get_upper_orbit_folder(),
+                                                   obsid=self.s)
+        return s
 
 
 class PRODUCT_ID(object):
@@ -115,6 +111,18 @@ class PRODUCT_ID(object):
     @property
     def jp2_fname(self):
         return self.s + '.JP2'
+
+    @property
+    def label_fname(self):
+        return '{}.LBL'.format(self.s)
+
+    @property
+    def storage_path(self):
+        return '{}/{}'.format(self.obsid.storage_path_stem, self.s)
+
+    @property
+    def label_storage_path(self):
+        return self.storage_path + '.LBL'
 
 
 class SOURCE_PRODUCT_ID(object):
@@ -190,7 +198,8 @@ class SOURCE_PRODUCT_ID(object):
 class HiRISE_Basename(object):
 
     def __init__(self, basename):
-        pass
+        self.basename = Path(basename)
+        self.prodid = PRODUCT_ID(self.basename.stem)
 
 
 class HiRISE_Path(object):
@@ -204,99 +213,35 @@ class HiRISE_URL(object):
     initurl = ('http://hirise-pds.lpl.arizona.edu/PDS/RDR/'
                'ESP/ORB_011400_011499/ESP_011491_0985/ESP_'
                '011491_0985_RED.LBL')
+    scheme = 'http'
+    netloc = 'hirise-pds.lpl.arizona.edu'
+    pdspath = Path('/PDS')
 
-    def __init__(self, phase, RDR=True, parse_result=None):
-        if parse_result is None:
-            parse_result = urlparse(self.initurl)
-        self.scheme = parse_result.scheme
-        self.netloc = parse_result.netloc
-        self.path = parse_result.path
-        self.params = parse_result.params
-        self.query = parse_result.query
-        self.fragment = parse_result.fragment
+    def __init__(self, product_string, params=None, query=None, fragment=None):
+        self.prodid = PRODUCT_ID(product_string)
+        self.params = params
+        self.query = query
+        self.fragment = fragment
 
-    def get_url(self):
-        return urlunparse([self.scheme, self.netloc, self.path,
+    @property
+    def rdr_labelpath(self):
+        path = self.pdspath / 'RDR' / self.prodid.label_storage_path
+        return str(path)
+
+    @property
+    def rdr_labelurl(self):
+        return urlunparse([self.scheme, self.netloc, self.rdr_labelpath,
                            self.params, self.query, self.fragment])
 
-    @classmethod
-    def from_url(cls, url):
-        return cls(urlparse(url))
+
+def get_color_from_path(path):
+    basename = HiRISE_Basename(path)
+    return basename.prodid.color
 
 
-def getCCDColourFromMosPath(path):
-    basename = Path(path).parent
-    firstpart = basename.partition('.')[0]
-    try:
-        return firstpart.split('_')[3]
-    except:
-        print(path)
-
-
-def getObsIDFromPath(path, instr='hirise'):
-    basename = Path(path).parent
-    if instr == 'hirise':
-        obsID = basename[:15]
-        try:
-            phase, orbit, targetcode = obsID.split('_')
-        except ValueError:
-            print("Path does not have standard ObsID, returning first 15 characters.")
-        return obsID
-    if instr == 'ctx':
-        try:
-            obsID = basename.split('_')[1]
-        except IndexError:
-            print("Path does not have CTX file name format. Returning empty")
-            return ''
-
-
-def getEDRFolder(orbitNumber):
-    '''
-    get the upper folder name where the given orbit folder is stored on hirise
-    input: orbitNumber(int)
-    '''
-    lower = int(orbitNumber) / 1000 * 1000
-    return "_".join(["EDRgen", str(lower).zfill(6), str(lower + 999).zfill(6)])
-
-
-def getUsersProcessedPath():
-    path = DEST_BASE
-    if sys.platform == 'darwin':
-        # on the Mac, don't create extra folder for processed files
-        pass
-    else:
-        path = pjoin(path, os.environ['LOGNAME'])
-    return path
-
-
-def getSourcePathFromID(idString):
-    sciencePhase, orbitString, targetCode = idString.split("_")
-    path = FROM_BASE
-    if not sys.platform == 'darwin':
-        path = pjoin(path, getEDRFolder(int(orbitString)))
-        path = pjoin(path, getUpperOrbitFolder(int(orbitString)))
-    path = pjoin(path, idString)
-    return path
-
-
-def getDestPathFromID(idString):
-    path = getUsersProcessedPath()
-    path = pjoin(path, idString)
-    return path
-
-
-def getStoredPathFromID(idString, in_work=False):
-    folder = ''
-    if in_work is True:
-        folder = 'maye'
-    path = pjoin(DEST_BASE, folder, idString)
-    return path
-
-
-def getMosPathFromIDandCCD(obsID, ccd, in_work=False):
-    root = getStoredPathFromID(obsID, in_work)
-    path = os.path.join(root, '_'.join([obsID, ccd]) + mosaic_extensions)
-    return path
+def get_obsid_from_path(path):
+    basename = HiRISE_Basename(Path(path).name)
+    return basename.prodid.obsid
 
 
 def rebin(a, newshape):
