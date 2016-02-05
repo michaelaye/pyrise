@@ -1,5 +1,5 @@
-from urllib.parse import urlunparse
-from urllib.request import urlretrieve
+from six.moves.urllib.parse import urlunparse
+from six.moves.urllib.request import urlretrieve
 
 import numpy as np
 from pathlib import Path
@@ -247,6 +247,18 @@ class HiRISE_URL(object):
 
 
 def get_rdr_label(obsid):
+    """Download the RED PRODUCT_ID label for `obsid`.
+
+    Parameters
+    ----------
+    obsid : str
+        HiRISE obsid in the standard form of ESP_012345_1234
+
+    Returns
+    -------
+    None
+        Storing the label file in the `labels_root` folder.
+    """
     prodid = PRODUCT_ID(obsid)
     prodid.color = 'RED'
     url = HiRISE_URL(prodid.s)
@@ -254,7 +266,7 @@ def get_rdr_label(obsid):
     savepath.parent.mkdir(exist_ok=True)
     print("Downloading\n", url.rdr_labelurl, 'to\n', savepath)
     try:
-        urlretrieve(url.rdr_labelurl, savepath)
+        urlretrieve(url.rdr_labelurl, str(savepath))
     except HTTPError as e:
         print(e)
 
