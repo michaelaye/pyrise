@@ -1,9 +1,9 @@
 from six.moves.urllib.parse import urlunparse
 from six.moves.urllib.request import urlretrieve
+from six.moves.urllib.error import HTTPError
 
 import numpy as np
 from pathlib import Path
-from urllib.error import HTTPError
 
 mosaic_extensions = '.cal.norm.map.equ.mos.cub'
 # mosaic_extensions = '.cal.des.map.cub'
