@@ -22,7 +22,8 @@ def read(*names, **kwargs):
 
 setup(
     name='hirise',
-    version='0.1.0',
+    use_scm_version=True,
+    setup_requires=['setuptools_scm'],
     license='ISC',
     description="Tools to work with MRO's HiRISE camera data.",
     long_description='%s\n%s' % (read('README.rst'), re.sub(':[a-z]+:`~?(.*?)`', r'``\1``', read('CHANGELOG.rst'))),
