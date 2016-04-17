@@ -1,9 +1,9 @@
+import numpy as np
+import pvl
+from pathlib import Path
+from six.moves.urllib.error import HTTPError
 from six.moves.urllib.parse import urlunparse
 from six.moves.urllib.request import urlretrieve
-from six.moves.urllib.error import HTTPError
-
-import numpy as np
-from pathlib import Path
 
 mosaic_extensions = '.cal.norm.map.equ.mos.cub'
 # mosaic_extensions = '.cal.des.map.cub'
@@ -269,6 +269,28 @@ def get_rdr_label(obsid):
         urlretrieve(url.rdr_labelurl, str(savepath))
     except HTTPError as e:
         print(e)
+
+
+class HiRISE_Label(object):
+
+    def __init__(self, fname):
+        self.label = pvl.load(str(fname))
+
+    @property
+    def binning(self):
+        return self.label['INSTRUMENT_SETTING_PARAMETERS']['MRO:BINNING'][4]
+
+    @property
+    def lines(self):
+        return self.label['UNCOMPRESSED_FILE']['IMAGE']['LINES']
+
+    @property
+    def line_samples(self):
+        return self.label['UNCOMPRESSED_FILE']['IMAGE']['LINE_SAMPLES']
+
+    @property
+    def l_s(self):
+        return self.label['VIEWING_PARAMETERS']['SOLAR_LONGITUDE'].value
 
 
 def get_color_from_path(path):
