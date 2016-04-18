@@ -84,7 +84,7 @@ class OBSERVATION_ID(object):
 class PRODUCT_ID(object):
     # ESP_012345_1234_RED
 
-    colors = ['RED', 'BG', 'IR']
+    colors = ['RED', 'BG', 'IR', 'COLOR']
 
     def __init__(self, initstr=None):
         if initstr is not None:
@@ -246,7 +246,7 @@ class HiRISE_URL(object):
                            self.params, self.query, self.fragment])
 
 
-def get_rdr_label(obsid):
+def get_rdr_red_label(obsid):
     """Download the RED PRODUCT_ID label for `obsid`.
 
     Parameters
@@ -271,14 +271,43 @@ def get_rdr_label(obsid):
         print(e)
 
 
+def get_rdr_color_label(obsid):
+    """Download the RED PRODUCT_ID label for `obsid`.
+
+    Parameters
+    ----------
+    obsid : str
+        HiRISE obsid in the standard form of ESP_012345_1234
+
+    Returns
+    -------
+    None
+        Storing the label file in the `labels_root` folder.
+    """
+    prodid = PRODUCT_ID(obsid)
+    prodid.color = 'COLOR'
+    url = HiRISE_URL(prodid.s)
+    savepath = labels_root() / Path(prodid.label_fname)
+    savepath.parent.mkdir(exist_ok=True)
+    print("Downloading\n", url.rdr_labelurl, 'to\n', savepath)
+    try:
+        urlretrieve(url.rdr_labelurl, str(savepath))
+    except HTTPError as e:
+        print(e)
+
+
 class HiRISE_Label(object):
 
     def __init__(self, fname):
         self.label = pvl.load(str(fname))
 
     @property
-    def binning(self):
+    def binning_red(self):
         return self.label['INSTRUMENT_SETTING_PARAMETERS']['MRO:BINNING'][4]
+
+    @property
+    def binning_color(self):
+        return self.label['INSTRUMENT_SETTING_PARAMETERS']['MRO:BINNING'][-1]
 
     @property
     def lines(self):
@@ -291,6 +320,10 @@ class HiRISE_Label(object):
     @property
     def l_s(self):
         return self.label['VIEWING_PARAMETERS']['SOLAR_LONGITUDE'].value
+
+    @property
+    def map_scale(self):
+        return self.label['IMAGE_MAP_PROJECTION']['MAP_SCALE'].value
 
 
 def get_color_from_path(path):
