@@ -82,36 +82,38 @@ class OBSERVATION_ID(object):
 
 
 class PRODUCT_ID(object):
-    # ESP_012345_1234_RED
+    """Manage storage paths for HiRISE RDR products (also EXTRAS.)
 
-    colors = ['RED', 'BG', 'IR', 'COLOR']
+    Attributes `jp2_path` and `label_path` get you the official RDR product,
+    with `kind` steering if you get the COLOR or the RED product.
+    All other properties go to the RDR/EXTRAS folder.
+
+    """
+    kinds = ['RED', 'BG', 'IR', 'COLOR', 'IRB','MIRB', 'MRGB', 'RGB']
 
     def __init__(self, initstr=None):
         if initstr is not None:
             tokens = initstr.split('_')
             self.obsid = OBSERVATION_ID('_'.join(tokens[:3]))
             try:
-                self.color = tokens[3]
+                self.kind = tokens[3]
             except IndexError:
-                self._color = None
+                self._kind = None
         else:
-            self._color = None
-
-    def _set_and_check_color(self, value):
-        self._color = value
+            self._kind = None
 
     @property
-    def color(self):
-        return self._color
+    def kind(self):
+        return self._kind
 
-    @color.setter
-    def color(self, value):
-        if value not in self.colors:
-            raise ValueError("Color must be in {}".format(self.colors))
-        self._color = value
+    @kind.setter
+    def kind(self, value):
+        if value not in self.kinds:
+            raise ValueError("kind must be in {}".format(self.kinds))
+        self._kind = value
 
     def __str__(self):
-        return "{}_{}".format(self.obsid, self.color)
+        return "{}_{}".format(self.obsid, self.kind)
 
     def __repr__(self):
         return self.__str__()
@@ -121,20 +123,83 @@ class PRODUCT_ID(object):
         return self.__str__()
 
     @property
-    def jp2_fname(self):
-        return self.s + '.JP2'
+    def storage_stem(self):
+        return '{}/{}'.format(self.obsid.storage_path_stem, self.s)
 
     @property
     def label_fname(self):
         return '{}.LBL'.format(self.s)
 
-    @property
-    def storage_path(self):
-        return '{}/{}'.format(self.obsid.storage_path_stem, self.s)
 
     @property
-    def label_storage_path(self):
-        return self.storage_path + '.LBL'
+    def label_path(self):
+        return 'RDR/' + self.storage_stem + '.LBL'
+
+    @property
+    def jp2_fname(self):
+        return self.s + '.JP2'
+
+    @property
+    def jp2_path(self):
+        prefix = 'RDR/'
+        postfix = ''
+        if self.kind not in ['RED', 'COLOR']:
+            prefix += 'EXTRAS/'
+        if self.kind in ['IRB']:
+            postfix = '.NOMAP'
+        return prefix + self.storage_stem + postfix + ".JP2"
+
+    @property
+    def nomap_jp2_path(self):
+        if self.kind in ['RED', 'IRB', 'RGB']:
+            return 'RDR/EXTRAS/' + self.storage_stem + '.NOMAP.JP2'
+        else:
+            raise AttributeError("No NOMAP exists for {}.".format(self.kind))
+
+    @property
+    def quicklook_path(self):
+        if self.kind in ['COLOR', 'RED']:
+            return Path('EXTRAS/RDR/') / (self.storage_stem + ".QLOOK.JP2")
+        else:
+            raise AttributeError("No quicklook exists for {} products.".format(self.kind))
+
+    @property
+    def abrowse_path(self):
+        if self.kind in ['COLOR', 'MIRB', 'MRGB', 'RED']:
+            return Path('EXTRAS/RDR/') / (self.storage_stem + '.abrowse.jpg')
+        else:
+            raise AttributeError("No abrowse exists for {}".format(self.kind))
+
+    @property
+    def browse_path(self):
+        inset = ''
+        if self.kind in ['IRB', 'RGB']:
+            inset = '.NOMAP'
+        if not self.kind in ['COLOR', 'MIRB', 'MRGB', 'RED', 'IRB', 'RGB']:
+            raise AttributeError("No browse exists for {}".format(self.kind))
+        else:
+            return Path('EXTRAS/RDR/') / (self.storage_stem + inset + '.browse.jpg')
+
+    @property
+    def thumbnail_path(self):
+        if self.kind in ['BG', 'IR']:
+            raise AttributeError("No thumbnail exists for {}".format(self.kind))
+        inset = ''
+        if self.kind in ['IRB', 'RGB']:
+            inset = '.NOMAP'
+        return Path('EXTRAS/RDR/') / (self.storage_stem + inset + '.thumb.jpg')
+
+    @property
+    def nomap_thumbnail_path(self):
+        if self.kind in ['RED', 'IRB', 'RGB']:
+            return Path('EXTRAS/RDR') / (self.storage_stem + '.NOMAP.thumb.jpg')
+        else:
+            raise AttributeError("No NOMAP thumbnail exists for {}".format(self.kind))
+
+    @property
+    def nomap_browse_path(self):
+        if self.kind in ['RED', 'IRB', 'RGB']:
+            return Path('EXTRAS/RDR') / (self.storage_stem + '.NOMAP.browse.jpg')
 
 
 class SOURCE_PRODUCT_ID(object):
@@ -159,7 +224,7 @@ class SOURCE_PRODUCT_ID(object):
             self._ccd = None
 
     def _parse_ccd(self, value):
-        sep = 2 if value[:2] in PRODUCT_ID.colors else 3
+        sep = 2 if value[:2] in PRODUCT_ID.kinds else 3
         return value[:sep], value[sep:]
 
     @property
@@ -214,13 +279,6 @@ class HiRISE_Basename(object):
         self.prodid = PRODUCT_ID(self.basename.stem)
 
 
-class HiRISE_Path(object):
-
-    @classmethod
-    def from_str(cls, s):
-        return cls()
-
-
 class HiRISE_URL(object):
     initurl = ('http://hirise-pds.lpl.arizona.edu/PDS/RDR/'
                'ESP/ORB_011400_011499/ESP_011491_0985/ESP_'
@@ -229,20 +287,21 @@ class HiRISE_URL(object):
     netloc = 'hirise-pds.lpl.arizona.edu'
     pdspath = Path('/PDS')
 
-    def __init__(self, product_string, params=None, query=None, fragment=None):
-        self.prodid = PRODUCT_ID(product_string)
+    def __init__(self, product_path, params=None, query=None, fragment=None):
+        self.product_path = product_path
         self.params = params
         self.query = query
         self.fragment = fragment
 
     @property
-    def rdr_labelpath(self):
-        path = self.pdspath / 'RDR' / self.prodid.label_storage_path
+    def path(self):
+        path = self.pdspath / self.product_path
         return str(path)
 
+
     @property
-    def rdr_labelurl(self):
-        return urlunparse([self.scheme, self.netloc, self.rdr_labelpath,
+    def labelurl(self):
+        return urlunparse([self.scheme, self.netloc, self.path,
                            self.params, self.query, self.fragment])
 
 
@@ -260,7 +319,7 @@ def get_rdr_red_label(obsid):
         Storing the label file in the `labels_root` folder.
     """
     prodid = PRODUCT_ID(obsid)
-    prodid.color = 'RED'
+    prodid.kind = 'RED'
     url = HiRISE_URL(prodid.s)
     savepath = labels_root() / Path(prodid.label_fname)
     savepath.parent.mkdir(exist_ok=True)
@@ -285,7 +344,7 @@ def get_rdr_color_label(obsid):
         Storing the label file in the `labels_root` folder.
     """
     prodid = PRODUCT_ID(obsid)
-    prodid.color = 'COLOR'
+    prodid.kind = 'COLOR'
     url = HiRISE_URL(prodid.s)
     savepath = labels_root() / Path(prodid.label_fname)
     savepath.parent.mkdir(exist_ok=True)
