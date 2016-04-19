@@ -300,7 +300,7 @@ class HiRISE_URL(object):
 
 
     @property
-    def labelurl(self):
+    def url(self):
         return urlunparse([self.scheme, self.netloc, self.path,
                            self.params, self.query, self.fragment])
 
@@ -323,11 +323,25 @@ def get_rdr_red_label(obsid):
     url = HiRISE_URL(prodid.s)
     savepath = labels_root() / Path(prodid.label_fname)
     savepath.parent.mkdir(exist_ok=True)
-    print("Downloading\n", url.rdr_labelurl, 'to\n', savepath)
+    print("Downloading\n", url.url, 'to\n', savepath)
     try:
         urlretrieve(url.rdr_labelurl, str(savepath))
     except HTTPError as e:
         print(e)
+
+
+def download_product(prodid_path, saveroot=None):
+    if saveroot is None:
+        saveroot = hirise_dropbox()
+
+    url = HiRISE_URL(prodid_path)
+    savepath = saveroot / prodid_path.name
+    print("Downloading\n", url.url, 'to\n', savepath)
+    try:
+        urlretrieve(url.url, str(savepath))
+    except HTTPError as e:
+        print(e)
+    return savepath
 
 
 def get_rdr_color_label(obsid):
