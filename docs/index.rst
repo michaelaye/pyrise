@@ -1,5 +1,5 @@
-Welcome to hirise-tools's documentation!
-======================================
+Welcome to the documentation of the hirise_tools package!
+=========================================================
 
 Contents:
 

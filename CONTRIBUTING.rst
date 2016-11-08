@@ -38,8 +38,8 @@ and "help wanted" is open to whoever wants to implement it.
 Write Documentation
 ~~~~~~~~~~~~~~~~~~~
 
-hirise-tools could always use more documentation, whether as part of the
-official hirise-tools docs, in docstrings, or even on the web in blog posts,
+hirise_tools could always use more documentation, whether as part of the
+official hirise_tools docs, in docstrings, or even on the web in blog posts,
 articles, and such.
 
 Submit Feedback
@@ -111,4 +111,3 @@ Tips
 To run a subset of tests::
 
 $ py.test tests.test_hirise_tools
-

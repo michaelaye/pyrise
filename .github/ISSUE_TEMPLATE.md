@@ -1,4 +1,4 @@
-* hirise-tools version:
+* hirise_tools version:
 * Python version:
 * Operating System:
 
