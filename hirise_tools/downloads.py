@@ -98,7 +98,7 @@ def download_product(prodid_path, saveroot=None):
     return savepath
 
 
-def download_red_channel(obsid, ccd, channel, saveroot=None):
+def download_RED_product(obsid, ccdno, channel, saveroot=None):
     if saveroot is None:
         saveroot = hirise_dropbox()
     else:
@@ -107,7 +107,7 @@ def download_red_channel(obsid, ccd, channel, saveroot=None):
             saveroot = hirise_dropbox() / saveroot
     saveroot.mkdir(exist_ok=True)
 
-    pid = RED_PRODUCT_ID(obsid, ccd, channel)
+    pid = RED_PRODUCT_ID(obsid, ccdno, channel)
     savepath = saveroot / pid.fname
     print("Downloading\n", pid.furl, 'to\n', savepath)
     try:
