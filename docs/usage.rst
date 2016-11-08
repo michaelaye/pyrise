@@ -2,6 +2,6 @@
 Usage
 =====
 
-To use HiRISE Tools in a project::
+To use hirise-tools in a project::
 
-	import hirise
+    import hirise_tools

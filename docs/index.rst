@@ -1,5 +1,5 @@
-Welcome to HiRISE Tools's documentation!
-==========================================
+Welcome to hirise-tools's documentation!
+======================================
 
 Contents:
 
@@ -9,10 +9,8 @@ Contents:
    readme
    installation
    usage
-   reference/index
    contributing
-   authors
-   changelog
+   authorshistory
 
 Indices and tables
 ==================
@@ -20,4 +18,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-

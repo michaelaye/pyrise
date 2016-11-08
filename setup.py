@@ -1,45 +1,54 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
-from __future__ import absolute_import, print_function
 
-import io
-import re
-from glob import glob
-from os.path import basename
-from os.path import dirname
-from os.path import join
-from os.path import splitext
-
-from setuptools import find_packages
 from setuptools import setup
 
+with open('README.rst') as readme_file:
+    readme = readme_file.read()
 
-def read(*names, **kwargs):
-    return io.open(
-        join(dirname(__file__), *names),
-        encoding=kwargs.get('encoding', 'utf8')
-    ).read()
+with open('HISTORY.rst') as history_file:
+    history = history_file.read()
+
+requirements = [
+    'Click>=6.0',
+    # TODO: put package requirements here
+]
+
+test_requirements = [
+    # TODO: put package test requirements here
+]
+
 
 setup(
-    name='hirise',
-    use_scm_version=True,
-    setup_requires=['setuptools_scm'],
-    license='ISC',
+    name='hirise_tools',
+    version='0.2.0',
     description="Tools to work with MRO's HiRISE camera data.",
-    long_description='%s\n%s' % (read('README.rst'), re.sub(':[a-z]+:`~?(.*?)`', r'``\1``', read('CHANGELOG.rst'))),
+    long_description=readme + '\n\n' + history,
     author='K.-Michael Aye',
     author_email='kmichael.aye@gmail.com',
-    url='https://github.com/michaelaye/hirise-tools',
-    packages=find_packages('src'),
-    package_dir={'': 'src'},
-    py_modules=[splitext(basename(path))[0] for path in glob('src/*.py')],
+    url='https://github.com/michaelaye/hirise_tools',
+    packages=[
+        'hirise_tools',
+    ]
+    package_dir={'hirise_tools':
+                 'hirise_tools'},
+    entry_points={
+        'console_scripts': [
+            'hirise_tools = hirise_tools.cli:main',
+        ]
+    },
     include_package_data=True,
+    install_requires=requirements,
+    license='ISC license',
     zip_safe=False,
+    keywords=[
+        'HiRISE', 'MRO', 'NASA', 'PDS',
+    ],
     classifiers=[
         # complete classifier list: http://pypi.python.org/pypi?%3Aaction=list_classifiers
-        'Development Status :: 5 - Production/Stable',
+        'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',
-        'License :: OSI Approved :: ISC License',
+        'License :: OSI Approved :: ISC License (ISCL)',
         'Operating System :: Unix',
         'Operating System :: POSIX',
         'Operating System :: Microsoft :: Windows',
@@ -47,20 +56,6 @@ setup(
         'Programming Language :: Python :: 3.5',
         'Topic :: Utilities',
     ],
-    keywords=[
-        # eg: 'keyword1', 'keyword2', 'keyword3',
-    ],
-    install_requires=[
-        # eg: 'aspectlib==1.1.1', 'six>=1.7',
-    ],
-    extras_require={
-        # eg:
-        #   'rst': ['docutils>=0.11'],
-        #   ':python_version=="2.6"': ['argparse'],
-    },
-    entry_points={
-        'console_scripts': [
-            'hirise = hirise.cli:main',
-        ]
-    },
+    test_suite='tests',
+    test_require=test_requirements
 )

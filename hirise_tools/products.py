@@ -320,10 +320,35 @@ def get_rdr_red_label(obsid):
     """
     prodid = PRODUCT_ID(obsid)
     prodid.kind = 'RED'
-    url = HiRISE_URL(prodid.s)
+    url = HiRISE_URL(prodid.label_path)
     savepath = labels_root() / Path(prodid.label_fname)
     savepath.parent.mkdir(exist_ok=True)
     print("Downloading\n", url.url, 'to\n', savepath)
+    try:
+        urlretrieve(url.rdr_labelurl, str(savepath))
+    except HTTPError as e:
+        print(e)
+
+
+def get_rdr_color_label(obsid):
+    """Download the RED PRODUCT_ID label for `obsid`.
+
+    Parameters
+    ----------
+    obsid : str
+        HiRISE obsid in the standard form of ESP_012345_1234
+
+    Returns
+    -------
+    None
+        Storing the label file in the `labels_root` folder.
+    """
+    prodid = PRODUCT_ID(obsid)
+    prodid.kind = 'COLOR'
+    url = HiRISE_URL(prodid.label_path)
+    savepath = labels_root() / Path(prodid.label_fname)
+    savepath.parent.mkdir(exist_ok=True)
+    print("Downloading\n", url.rdr_labelurl, 'to\n', savepath)
     try:
         urlretrieve(url.rdr_labelurl, str(savepath))
     except HTTPError as e:
@@ -343,30 +368,6 @@ def download_product(prodid_path, saveroot=None):
         print(e)
     return savepath
 
-
-def get_rdr_color_label(obsid):
-    """Download the RED PRODUCT_ID label for `obsid`.
-
-    Parameters
-    ----------
-    obsid : str
-        HiRISE obsid in the standard form of ESP_012345_1234
-
-    Returns
-    -------
-    None
-        Storing the label file in the `labels_root` folder.
-    """
-    prodid = PRODUCT_ID(obsid)
-    prodid.kind = 'COLOR'
-    url = HiRISE_URL(prodid.s)
-    savepath = labels_root() / Path(prodid.label_fname)
-    savepath.parent.mkdir(exist_ok=True)
-    print("Downloading\n", url.rdr_labelurl, 'to\n', savepath)
-    try:
-        urlretrieve(url.rdr_labelurl, str(savepath))
-    except HTTPError as e:
-        print(e)
 
 
 class HiRISE_Label(object):
