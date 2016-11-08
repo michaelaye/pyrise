@@ -272,17 +272,17 @@ class SOURCE_PRODUCT_ID(object):
     bg_ccds = ['BG12', 'BG13']
     ccds = red_ccds + ir_ccds + bg_ccds
 
-    def __init__(self, sprodid=None):
-        if sprodid is not None:
-            tokens = sprodid.split('_')
+    def __init__(self, spid=None):
+        if spid is not None:
+            tokens = spid.split('_')
             obsid = '_'.join(tokens[:3])
             ccd = tokens[3]
             color, ccdno = self._parse_ccd(ccd)
-            self.prodid = PRODUCT_ID('_'.join([obsid, color]))
+            self.pid = PRODUCT_ID('_'.join([obsid, color]))
             self.ccd = ccd
             self.channel = tokens[4]
         else:
-            self.prodid = None
+            self.pid = None
             self._channel = None
             self._ccd = None
 
@@ -309,8 +309,8 @@ class SOURCE_PRODUCT_ID(object):
         if value not in self.ccds:
             raise ValueError("CCD value must be in {}.".format(self.ccds))
         self._ccd = value
-        if self.prodid is not None:
-            self.prodid.color = self.color
+        if self.pid is not None:
+            self.pid.color = self.color
 
     @property
     def color(self):
@@ -322,7 +322,7 @@ class SOURCE_PRODUCT_ID(object):
         return self.ccd[offset:]
 
     def __str__(self):
-        return "{}{}_{}".format(self.prodid, self.ccdno, self.channel)
+        return "{}{}_{}".format(self.pid, self.ccdno, self.channel)
 
     def __repr__(self):
         return self.__str__()
@@ -337,7 +337,7 @@ class SOURCE_PRODUCT_ID(object):
 
     @property
     def fpath(self):
-        return Path(self.prodid.edr_storage_stem).parent / self.fname
+        return Path(self.pid.edr_storage_stem).parent / self.fname
 
     @property
     def furl(self):
@@ -345,8 +345,13 @@ class SOURCE_PRODUCT_ID(object):
         return hiurl.url
 
 
-def get_RED_ccd(obsid, ccdno, channel):
-    return SOURCE_PRODUCT_ID('{}_RED{}_{}'.format(obsid, ccdno, channel))
+class RED_PRODUCT_ID(SOURCE_PRODUCT_ID):
+    def __init__(self, obsid, ccdno, channel):
+        self.ccds = self.red_ccds
+        super().__init__('{}_RED{}_{}'.format(obsid, ccdno, channel))
 
-def get_IR_ccd(obsid, ccdno, channel):
-    return SOURCE_PRODUCT_ID('{}_IR{}_{}'.format(obsid, ccdno, channel))
+
+class IR_PRODUCT_ID(SOURCE_PRODUCT_ID):
+    def __init__(self,obsid, ccdno, channel):
+        self.ccds = self.ir_ccds
+        super().__init__('{}_IR{}_{}'.format(obsid, ccdno, channel))

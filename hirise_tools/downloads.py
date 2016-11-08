@@ -1,5 +1,5 @@
 from pathlib import Path
-from .products import PRODUCT_ID, HiRISE_URL, get_RED_ccd
+from .products import PRODUCT_ID, HiRISE_URL, RED_PRODUCT_ID
 from six.moves.urllib.request import urlretrieve
 from six.moves.urllib.error import HTTPError
 
@@ -33,13 +33,13 @@ def get_rdr_some_label(kind, obsid):
     None
         Storing the label file in the `labels_root` folder.
     """
-    prodid = PRODUCT_ID(obsid)
-    prodid.kind = kind
-    savepath = labels_root() / Path(prodid.label_fname)
+    pid = PRODUCT_ID(obsid)
+    pid.kind = kind
+    savepath = labels_root() / Path(pid.label_fname)
     savepath.parent.mkdir(exist_ok=True)
-    print("Downloading\n", prodid.label_url, 'to\n', savepath)
+    print("Downloading\n", pid.label_url, 'to\n', savepath)
     try:
-        urlretrieve(prodid.label_url, str(savepath))
+        urlretrieve(pid.label_url, str(savepath))
     except HTTPError as e:
         print(e)
 
@@ -87,6 +87,7 @@ def download_product(prodid_path, saveroot=None):
     elif not saveroot.is_absolute():
         saveroot = hirise_dropbox() / saveroot
 
+    saveroot.mkdir(exist_ok=True)
     url = HiRISE_URL(prodid_path)
     savepath = saveroot / prodid_path.name
     print("Downloading\n", url.url, 'to\n', savepath)
@@ -97,19 +98,20 @@ def download_product(prodid_path, saveroot=None):
     return savepath
 
 
-def download_RED_channel(obsid, ccd, channel, saveroot=None):
+def download_red_channel(obsid, ccd, channel, saveroot=None):
     if saveroot is None:
         saveroot = hirise_dropbox()
     else:
         saveroot = Path(saveroot)
         if not saveroot.is_absolute():
             saveroot = hirise_dropbox() / saveroot
+    saveroot.mkdir(exist_ok=True)
 
-    prodid = get_RED_ccd(obsid, ccd, channel)
-    savepath = saveroot / prodid.fname
-    print("Downloading\n", prodid.furl, 'to\n', savepath)
+    pid = RED_PRODUCT_ID(obsid, ccd, channel)
+    savepath = saveroot / pid.fname
+    print("Downloading\n", pid.furl, 'to\n', savepath)
     try:
-        urlretrieve(prodid.furl, str(savepath))
+        urlretrieve(pid.furl, str(savepath))
     except HTTPError as e:
         print(e)
     return savepath
