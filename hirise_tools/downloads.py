@@ -98,7 +98,7 @@ def download_product(prodid_path, saveroot=None):
     return savepath
 
 
-def download_RED_product(obsid, ccdno, channel, saveroot=None):
+def download_RED_product(obsid, ccdno, channel, saveroot=None, overwrite=False):
     if saveroot is None:
         saveroot = hirise_dropbox()
     else:
@@ -109,6 +109,11 @@ def download_RED_product(obsid, ccdno, channel, saveroot=None):
 
     pid = RED_PRODUCT_ID(obsid, ccdno, channel)
     savepath = saveroot / pid.fname
+
+    # if file already is there:
+    if savepath.exists() and not overwrite:
+        return savepath
+
     print("Downloading\n", pid.furl, 'to\n', savepath)
     try:
         urlretrieve(pid.furl, str(savepath))
