@@ -343,3 +343,10 @@ class SOURCE_PRODUCT_ID(object):
     def furl(self):
         hiurl = HiRISE_URL(self.fpath)
         return hiurl.url
+
+
+def get_RED_ccd(obsid, ccdno, channel):
+    return SOURCE_PRODUCT_ID('{}_RED{}_{}'.format(obsid, ccdno, channel))
+
+def get_IR_ccd(obsid, ccdno, channel):
+    return SOURCE_PRODUCT_ID('{}_IR{}_{}'.format(obsid, ccdno, channel))
