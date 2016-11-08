@@ -77,7 +77,7 @@ def get_rdr_color_label(obsid):
     None
         Storing the label file in the `labels_root` folder.
     """
-    get_rdr_some_label(obsid, 'COLOR')
+    get_rdr_some_label('COLOR', obsid)
 
 
 def download_product(prodid_path, saveroot=None):
