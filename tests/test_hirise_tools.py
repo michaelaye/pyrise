@@ -13,7 +13,7 @@ import pytest
 from contextlib import contextmanager
 from click.testing import CliRunner
 
-from hirise_tools import hirise_tools
+import hirise_tools
 from hirise_tools import cli
 
 
