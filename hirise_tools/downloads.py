@@ -4,6 +4,16 @@ from six.moves.urllib.request import urlretrieve
 from six.moves.urllib.error import HTTPError
 
 
+def hirise_dropbox():
+    home = Path.home()
+    return home / 'Dropbox' / 'data' / 'hirise'
+
+
+def labels_root():
+    dropbox = hirise_dropbox()
+    return dropbox / 'labels'
+
+
 def get_rdr_red_label(obsid):
     """Download the RED PRODUCT_ID label for `obsid`.
 

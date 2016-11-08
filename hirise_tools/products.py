@@ -2,16 +2,6 @@ from pathlib import Path
 from six.moves.urllib.parse import urlunparse
 
 
-def hirise_dropbox():
-    home = Path.home()
-    return home / 'Dropbox' / 'data' / 'hirise'
-
-
-def labels_root():
-    dropbox = hirise_dropbox()
-    return dropbox / 'labels'
-
-
 class HiRISE_URL(object):
     """Manage HiRISE URLs.
 
@@ -353,4 +343,3 @@ class SOURCE_PRODUCT_ID(object):
     def furl(self):
         hiurl = HiRISE_URL(self.fpath)
         return hiurl.url
-        
