@@ -1,12 +1,5 @@
-import numpy as np
-import pvl
 from pathlib import Path
-from six.moves.urllib.error import HTTPError
 from six.moves.urllib.parse import urlunparse
-from six.moves.urllib.request import urlretrieve
-
-mosaic_extensions = '.cal.norm.map.equ.mos.cub'
-# mosaic_extensions = '.cal.des.map.cub'
 
 
 def hirise_dropbox():
@@ -19,8 +12,56 @@ def labels_root():
     return dropbox / 'labels'
 
 
+class HiRISE_URL(object):
+    """Manage HiRISE URLs.
+
+    Provide a storage path as calculated from above objects and put together the full
+    URL to the HiRISE product.
+
+    Parameters
+    ----------
+    product_path : str or pathlib.Path
+        Storage path to the product
+
+
+    """
+    initurl = ('http://hirise-pds.lpl.arizona.edu/PDS/RDR/'
+               'ESP/ORB_011400_011499/ESP_011491_0985/ESP_'
+               '011491_0985_RED.LBL')
+    scheme = 'http'
+    netloc = 'hirise-pds.lpl.arizona.edu'
+    pdspath = Path('/PDS')
+
+    def __init__(self, product_path, params=None, query=None, fragment=None):
+        self.product_path = product_path
+        self.params = params
+        self.query = query
+        self.fragment = fragment
+
+    @property
+    def path(self):
+        path = self.pdspath / self.product_path
+        return str(path)
+
+    @property
+    def url(self):
+        return urlunparse([self.scheme, self.netloc, self.path,
+                           self.params, self.query, self.fragment])
+
+
 class OBSERVATION_ID(object):
-    # ESP_012345_1234
+    """Manage HiRISE observation ids.
+
+    For example PSP_003092_0985.
+
+    `phase` is set to PSP for orbits < 11000, no setting required.
+
+    Parameters
+    ----------
+    obsid : str, optional
+        One can optionally also create an 'empty' OBSERVATION_ID object and set the
+        properties accordingly to create a new obsid.
+    """
 
     def __init__(self, obsid=None):
         if obsid is not None:
@@ -88,8 +129,21 @@ class PRODUCT_ID(object):
     with `kind` steering if you get the COLOR or the RED product.
     All other properties go to the RDR/EXTRAS folder.
 
+    Parameters
+    ----------
+    initstr : str, optional
+
+    Note
+    ----
+    The "PDS" part of the path is handled in the HiRISE_URL class.
+
     """
     kinds = ['RED', 'BG', 'IR', 'COLOR', 'IRB','MIRB', 'MRGB', 'RGB']
+
+    @classmethod
+    def from_path(cls, path):
+        path = Path(path)
+        return cls(path.stem)
 
     def __init__(self, initstr=None):
         if initstr is not None:
@@ -134,6 +188,15 @@ class PRODUCT_ID(object):
     @property
     def label_path(self):
         return 'RDR/' + self.storage_stem + '.LBL'
+
+    @property
+    def label_url(self):
+        hiurl = HiRISE_URL(self.label_path)
+        return hiurl.url
+
+
+    # TODO: implement general self.obj_url for all paths.
+
 
     @property
     def jp2_fname(self):
@@ -201,8 +264,18 @@ class PRODUCT_ID(object):
         if self.kind in ['RED', 'IRB', 'RGB']:
             return Path('EXTRAS/RDR') / (self.storage_stem + '.NOMAP.browse.jpg')
 
+    @property
+    def edr_storage_stem(self):
+        return 'EDR/' + self.storage_stem
+
 
 class SOURCE_PRODUCT_ID(object):
+    """Manage SOURCE_PRODUCT_ID.
+
+    Example
+    -------
+    'PSP_003092_0985_RED4_0'
+    """
 
     red_ccds = ['RED'+str(i) for i in range(10)]
     ir_ccds = ['IR10', 'IR11']
@@ -246,7 +319,8 @@ class SOURCE_PRODUCT_ID(object):
         if value not in self.ccds:
             raise ValueError("CCD value must be in {}.".format(self.ccds))
         self._ccd = value
-        self.prodid.color = self.color
+        if self.prodid is not None:
+            self.prodid.color = self.color
 
     @property
     def color(self):
@@ -271,162 +345,12 @@ class SOURCE_PRODUCT_ID(object):
     def fname(self):
         return self.s + '.IMG'
 
-
-class HiRISE_Basename(object):
-
-    def __init__(self, basename):
-        self.basename = Path(basename)
-        self.prodid = PRODUCT_ID(self.basename.stem)
-
-
-class HiRISE_URL(object):
-    initurl = ('http://hirise-pds.lpl.arizona.edu/PDS/RDR/'
-               'ESP/ORB_011400_011499/ESP_011491_0985/ESP_'
-               '011491_0985_RED.LBL')
-    scheme = 'http'
-    netloc = 'hirise-pds.lpl.arizona.edu'
-    pdspath = Path('/PDS')
-
-    def __init__(self, product_path, params=None, query=None, fragment=None):
-        self.product_path = product_path
-        self.params = params
-        self.query = query
-        self.fragment = fragment
+    @property
+    def fpath(self):
+        return Path(self.prodid.edr_storage_stem).parent / self.fname
 
     @property
-    def path(self):
-        path = self.pdspath / self.product_path
-        return str(path)
-
-
-    @property
-    def url(self):
-        return urlunparse([self.scheme, self.netloc, self.path,
-                           self.params, self.query, self.fragment])
-
-
-def get_rdr_red_label(obsid):
-    """Download the RED PRODUCT_ID label for `obsid`.
-
-    Parameters
-    ----------
-    obsid : str
-        HiRISE obsid in the standard form of ESP_012345_1234
-
-    Returns
-    -------
-    None
-        Storing the label file in the `labels_root` folder.
-    """
-    prodid = PRODUCT_ID(obsid)
-    prodid.kind = 'RED'
-    url = HiRISE_URL(prodid.label_path)
-    savepath = labels_root() / Path(prodid.label_fname)
-    savepath.parent.mkdir(exist_ok=True)
-    print("Downloading\n", url.url, 'to\n', savepath)
-    try:
-        urlretrieve(url.rdr_labelurl, str(savepath))
-    except HTTPError as e:
-        print(e)
-
-
-def get_rdr_color_label(obsid):
-    """Download the RED PRODUCT_ID label for `obsid`.
-
-    Parameters
-    ----------
-    obsid : str
-        HiRISE obsid in the standard form of ESP_012345_1234
-
-    Returns
-    -------
-    None
-        Storing the label file in the `labels_root` folder.
-    """
-    prodid = PRODUCT_ID(obsid)
-    prodid.kind = 'COLOR'
-    url = HiRISE_URL(prodid.label_path)
-    savepath = labels_root() / Path(prodid.label_fname)
-    savepath.parent.mkdir(exist_ok=True)
-    print("Downloading\n", url.rdr_labelurl, 'to\n', savepath)
-    try:
-        urlretrieve(url.rdr_labelurl, str(savepath))
-    except HTTPError as e:
-        print(e)
-
-
-def download_product(prodid_path, saveroot=None):
-    if saveroot is None:
-        saveroot = hirise_dropbox()
-
-    url = HiRISE_URL(prodid_path)
-    savepath = saveroot / prodid_path.name
-    print("Downloading\n", url.url, 'to\n', savepath)
-    try:
-        urlretrieve(url.url, str(savepath))
-    except HTTPError as e:
-        print(e)
-    return savepath
-
-
-
-class HiRISE_Label(object):
-
-    def __init__(self, fname):
-        self.label = pvl.load(str(fname))
-
-    @property
-    def binning_red(self):
-        return self.label['INSTRUMENT_SETTING_PARAMETERS']['MRO:BINNING'][4]
-
-    @property
-    def binning_color(self):
-        return self.label['INSTRUMENT_SETTING_PARAMETERS']['MRO:BINNING'][-1]
-
-    @property
-    def lines(self):
-        return self.label['UNCOMPRESSED_FILE']['IMAGE']['LINES']
-
-    @property
-    def line_samples(self):
-        return self.label['UNCOMPRESSED_FILE']['IMAGE']['LINE_SAMPLES']
-
-    @property
-    def l_s(self):
-        return self.label['VIEWING_PARAMETERS']['SOLAR_LONGITUDE'].value
-
-    @property
-    def map_scale(self):
-        return self.label['IMAGE_MAP_PROJECTION']['MAP_SCALE'].value
-
-
-def get_color_from_path(path):
-    basename = HiRISE_Basename(path)
-    return basename.prodid.color
-
-
-def get_obsid_from_path(path):
-    basename = HiRISE_Basename(Path(path).name)
-    return basename.prodid.obsid
-
-
-def rebin(a, newshape):
-    """Rebin an array to a new shape."""
-    assert len(a.shape) == len(newshape)
-
-    slices = [slice(0, old, float(old) / new) for old, new in zip(a.shape, newshape)]
-    coordinates = np.mgrid[slices]
-    indices = coordinates.astype('i')  # choose the biggest smaller integer index
-    print(len(indices), indices.max())
-    return a[tuple(indices)]
-
-
-def rebin_factor(a, newshape):
-    '''Rebin an array to a new shape.
-    newshape must be a factor of a.shape.
-    '''
-    assert len(a.shape) == len(newshape)
-    assert not np.sometrue(np.mod(a.shape, newshape))
-
-    slices = [slice(None, None, old / new) for old, new in zip(a.shape, newshape)]
-    return a[slices]
+    def furl(self):
+        hiurl = HiRISE_URL(self.fpath)
+        return hiurl.url
+        
