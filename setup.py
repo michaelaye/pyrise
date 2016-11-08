@@ -29,7 +29,7 @@ setup(
     url='https://github.com/michaelaye/hirise_tools',
     packages=[
         'hirise_tools',
-    ]
+    ],
     package_dir={'hirise_tools':
                  'hirise_tools'},
     entry_points={
