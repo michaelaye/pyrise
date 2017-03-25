@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def rebin(a, newshape):
     """Rebin an array to a new shape."""
     assert len(a.shape) == len(newshape)
