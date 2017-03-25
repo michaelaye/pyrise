@@ -1,5 +1,11 @@
 from pathlib import Path
 from six.moves.urllib.parse import urlunparse
+from six.moves.urllib.error import HTTPError
+from six.moves.urllib.request import urlretrieve
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 class HiRISE_URL(object):
@@ -272,7 +278,7 @@ class SOURCE_PRODUCT_ID(object):
     bg_ccds = ['BG12', 'BG13']
     ccds = red_ccds + ir_ccds + bg_ccds
 
-    def __init__(self, spid=None):
+    def __init__(self, spid=None, saveroot=None):
         if spid is not None:
             tokens = spid.split('_')
             obsid = '_'.join(tokens[:3])
@@ -281,10 +287,14 @@ class SOURCE_PRODUCT_ID(object):
             self.pid = PRODUCT_ID('_'.join([obsid, color]))
             self.ccd = ccd
             self.channel = tokens[4]
+            self.saveroot = saveroot
         else:
             self.pid = None
             self._channel = None
             self._ccd = None
+
+    def __getattr__(self, value):
+        return getattr(self.pid, value)
 
     def _parse_ccd(self, value):
         sep = 2 if value[:2] in PRODUCT_ID.kinds else 3
@@ -336,6 +346,10 @@ class SOURCE_PRODUCT_ID(object):
         return self.s + '.IMG'
 
     @property
+    def local_cube(self):
+        return self.local_path.with_suffix('.cub')
+
+    @property
     def fpath(self):
         return Path(self.pid.edr_storage_stem).parent / self.fname
 
@@ -344,11 +358,30 @@ class SOURCE_PRODUCT_ID(object):
         hiurl = HiRISE_URL(self.fpath)
         return hiurl.url
 
+    @property
+    def stitched_cube_name(self):
+        return f"{self.pid.obsid.s}_{self.ccd}.cub"
+
+    @property
+    def local_path(self):
+        savepath = self.saveroot / str(self.obsid) / self.fname
+        return savepath
+
+    def download(self, overwrite=False):
+        savepath = self.local_path
+        savepath.parent.mkdir(parents=True, exist_ok=True)
+        logger.info(f"Downloading\n{self.furl}\nto\n{savepath}")
+        try:
+            urlretrieve(self.furl, str(savepath))
+        except HTTPError as e:
+            logger.error(e.__str__())
+
 
 class RED_PRODUCT_ID(SOURCE_PRODUCT_ID):
-    def __init__(self, obsid, ccdno, channel):
+    def __init__(self, obsid, ccdno, channel, **kwargs):
         self.ccds = self.red_ccds
-        super().__init__('{}_RED{}_{}'.format(obsid, ccdno, channel))
+        super().__init__('{}_RED{}_{}'.format(obsid, ccdno, channel),
+                         **kwargs)
 
 
 class IR_PRODUCT_ID(SOURCE_PRODUCT_ID):
