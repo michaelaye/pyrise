@@ -134,7 +134,7 @@ class PRODUCT_ID(object):
     The "PDS" part of the path is handled in the HiRISE_URL class.
 
     """
-    kinds = ['RED', 'BG', 'IR', 'COLOR', 'IRB','MIRB', 'MRGB', 'RGB']
+    kinds = ['RED', 'BG', 'IR', 'COLOR', 'IRB', 'MIRB', 'MRGB', 'RGB']
 
     @classmethod
     def from_path(cls, path):
@@ -180,7 +180,6 @@ class PRODUCT_ID(object):
     def label_fname(self):
         return '{}.LBL'.format(self.s)
 
-
     @property
     def label_path(self):
         return 'RDR/' + self.storage_stem + '.LBL'
@@ -190,9 +189,7 @@ class PRODUCT_ID(object):
         hiurl = HiRISE_URL(self.label_path)
         return hiurl.url
 
-
     # TODO: implement general self.obj_url for all paths.
-
 
     @property
     def jp2_fname(self):
@@ -234,7 +231,7 @@ class PRODUCT_ID(object):
         inset = ''
         if self.kind in ['IRB', 'RGB']:
             inset = '.NOMAP'
-        if not self.kind in ['COLOR', 'MIRB', 'MRGB', 'RED', 'IRB', 'RGB']:
+        if self.kind not in ['COLOR', 'MIRB', 'MRGB', 'RED', 'IRB', 'RGB']:
             raise AttributeError("No browse exists for {}".format(self.kind))
         else:
             return Path('EXTRAS/RDR/') / (self.storage_stem + inset + '.browse.jpg')
@@ -273,7 +270,7 @@ class SOURCE_PRODUCT_ID(object):
     'PSP_003092_0985_RED4_0'
     """
 
-    red_ccds = ['RED'+str(i) for i in range(10)]
+    red_ccds = ['RED' + str(i) for i in range(10)]
     ir_ccds = ['IR10', 'IR11']
     bg_ccds = ['BG12', 'BG13']
     ccds = red_ccds + ir_ccds + bg_ccds
@@ -385,6 +382,6 @@ class RED_PRODUCT_ID(SOURCE_PRODUCT_ID):
 
 
 class IR_PRODUCT_ID(SOURCE_PRODUCT_ID):
-    def __init__(self,obsid, ccdno, channel):
+    def __init__(self, obsid, ccdno, channel):
         self.ccds = self.ir_ccds
         super().__init__('{}_IR{}_{}'.format(obsid, ccdno, channel))
