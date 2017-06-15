@@ -21,10 +21,10 @@ class HiRISE_URL(object):
 
 
     """
-    initurl = ('http://hirise-pds.lpl.arizona.edu/PDS/RDR/'
+    initurl = ('https://hirise-pds.lpl.arizona.edu/PDS/RDR/'
                'ESP/ORB_011400_011499/ESP_011491_0985/ESP_'
                '011491_0985_RED.LBL')
-    scheme = 'http'
+    scheme = 'https'
     netloc = 'hirise-pds.lpl.arizona.edu'
     pdspath = Path('/PDS')
 
