@@ -329,14 +329,14 @@ class SOURCE_PRODUCT_ID(object):
         return self.ccd[offset:]
 
     def __str__(self):
-        return "{}{}_{}".format(self.pid, self.ccdno, self.channel)
+        return "{}: {}{}_{}".format(self.__class__.__name__, self.pid, self.ccdno, self.channel)
 
     def __repr__(self):
         return self.__str__()
 
     @property
     def s(self):
-        return self.__str__()
+        return "{}{}_{}".format(self.pid, self.ccdno, self.channel)
 
     @property
     def fname(self):
