@@ -366,6 +366,10 @@ class SOURCE_PRODUCT_ID(object):
 
     def download(self, overwrite=False):
         savepath = self.local_path
+        if savepath.exists() and not overwrite:
+            logger.warning("File exists and I'm not allowed to overwrite:"
+                           " %s", savepath)
+            return
         savepath.parent.mkdir(parents=True, exist_ok=True)
         logger.info(f"Downloading\n{self.furl}\nto\n{savepath}")
         try:
