@@ -7,12 +7,8 @@ class HiRISE_Label(object):
         self.label = pvl.load(str(fname))
 
     @property
-    def binning_red(self):
-        return self.label['INSTRUMENT_SETTING_PARAMETERS']['MRO:BINNING'][4]
-
-    @property
-    def binning_color(self):
-        return self.label['INSTRUMENT_SETTING_PARAMETERS']['MRO:BINNING'][-1]
+    def binning(self):
+        return self.label['INSTRUMENT_SETTING_PARAMETERS']['MRO:BINNING']
 
     @property
     def lines(self):
