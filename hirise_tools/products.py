@@ -144,13 +144,21 @@ class PRODUCT_ID(object):
     def __init__(self, initstr=None):
         if initstr is not None:
             tokens = initstr.split('_')
-            self.obsid = OBSERVATION_ID('_'.join(tokens[:3]))
+            self._obsid = OBSERVATION_ID('_'.join(tokens[:3]))
             try:
                 self.kind = tokens[3]
             except IndexError:
                 self._kind = None
         else:
             self._kind = None
+
+    @property
+    def obsid(self):
+        return self._obsid
+
+    @obsid.setter
+    def obsid(self, value):
+        self._obsid = OBSERVATION_ID(value)
 
     @property
     def kind(self):
