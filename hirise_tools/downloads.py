@@ -1,5 +1,7 @@
+import subprocess
 from pathlib import Path
 
+import click
 from pptx import Presentation
 from scipy.misc import imread
 from six.moves.urllib.error import HTTPError
@@ -14,6 +16,10 @@ def hirise_dropbox():
 
 def labels_root():
     return hirise_dropbox() / 'labels'
+
+
+def browse_root():
+    return hirise_dropbox() / 'browse'
 
 
 def get_rdr_some_label(kind, obsid):
@@ -152,7 +158,7 @@ def download_browse_product(obsid, kind='RED', annotated=True, saveroot='.', ove
     savepath.parent.mkdir(parents=True, exist_ok=True)
 
     if savepath.exists() and not overwrite:
-        print("Path exists and 'overwrite' switch is False:", savepath)
+        print("Path exists. No download required.", savepath)
         return savepath
 
     print("Downloading\n", url, '\nto\n', savepath)
@@ -161,6 +167,13 @@ def download_browse_product(obsid, kind='RED', annotated=True, saveroot='.', ove
     except HTTPError as e:
         print(e)
     return savepath
+
+
+@click.command()
+@click.argument('obsid')
+def get_and_display_browse_product(obsid):
+    path = download_browse_product(obsid)
+    subprocess.run(["open", "-a", "Preview", path])
 
 
 def create_browse_presentation(obsids, savename='obsid_browse_images', **kwargs):

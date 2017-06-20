@@ -35,6 +35,7 @@ setup(
     entry_points={
         'console_scripts': [
             'hirise_tools = hirise_tools.cli:main',
+            'abrowse = hirise_tools.downloads:get_and_display_browse_product',
         ]
     },
     include_package_data=True,
