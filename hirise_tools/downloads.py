@@ -1,5 +1,7 @@
 from pathlib import Path
 
+from pptx import Presentation
+from scipy.misc import imread
 from six.moves.urllib.error import HTTPError
 from six.moves.urllib.request import urlretrieve
 
@@ -17,9 +19,7 @@ def labels_root():
 def get_rdr_some_label(kind, obsid):
     """Download `some` PRODUCT_ID label for `obsid`.
 
-    Note
-    ----
-    The RED channel is also called the B&W channel on the HiRISE website.
+    Note, that the RED channel is also called the B&W channel on the HiRISE website.
 
     Parameters
     ----------
@@ -32,6 +32,7 @@ def get_rdr_some_label(kind, obsid):
     -------
     None
         Storing the label file in the `labels_root` folder.
+
     """
     pid = PRODUCT_ID(obsid)
     pid.kind = kind
@@ -121,3 +122,67 @@ def download_RED_product(obsid, ccdno, channel, saveroot=None, overwrite=False):
     except HTTPError as e:
         print(e)
     return savepath
+
+
+def download_browse_product(obsid, kind='RED', annotated=True, saveroot='.', overwrite=False):
+    """Download a browse product from HiRISE website.
+
+    By default, store it in current path.
+
+    Parameters
+    ----------
+    obsid : str
+        HiRISE observation ID
+    kind : {'RED','COLOR'}, optional
+        String indicating the kind of required browse product. Default: 'RED'
+    annotated : bool, optional
+        Switch to control if the annotated version is required. Default: True
+    saveroot : str, pathlib.Path, optional
+        Path in where the browse product is being stored. Default: '.'
+    overwrite : bool, optional
+        Boolean switch to control if an existing path should be overwritten. Default: False
+    """
+    pid = PRODUCT_ID(f"{obsid}_{kind}")
+    if annotated is True:
+        url = pid.abrowse_url
+    else:
+        url = pid.browse_url
+    saveroot = Path(saveroot)
+    savepath = saveroot / Path(url).name
+    savepath.parent.mkdir(parents=True, exist_ok=True)
+
+    if savepath.exists() and not overwrite:
+        print("Path exists and 'overwrite' switch is False:", savepath)
+        return savepath
+
+    print("Downloading\n", url, '\nto\n', savepath)
+    try:
+        urlretrieve(url, str(savepath))
+    except HTTPError as e:
+        print(e)
+    return savepath
+
+
+def create_browse_presentation(obsids, savename='obsid_browse_images', **kwargs):
+    savepath = str(savename) + '.pptx'
+    prs = Presentation()
+
+    pic_left = int(prs.slide_width * 0.0)
+    pic_top = int(prs.slide_height * 0.0)
+
+    blank_slide_layout = prs.slide_layouts[6]
+
+    for obsid in obsids[0:]:
+        imgpath = str(download_browse_product(obsid, **kwargs))
+        slide = prs.slides.add_slide(blank_slide_layout)
+        img = imread(imgpath)
+        ratio = img.shape[0] / img.shape[1]
+        if ratio < 1:
+            pic_width = int(prs.slide_width)
+            pic_height = int(pic_width * img.shape[0] / img.shape[1])
+        else:
+            pic_height = int(prs.slide_height)
+            pic_width = int(pic_height / ratio)
+        slide.shapes.add_picture(imgpath, pic_left, pic_top, pic_width, pic_height)
+
+    prs.save(savepath)
