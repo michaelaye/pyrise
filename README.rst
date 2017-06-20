@@ -18,9 +18,6 @@ hirise_tools
      :alt: Updates
 
 
-Python Boilerplate contains all the boilerplate you need to create a Python package.
-
-
 * Free software: ISC license
 * Documentation: https://hirise-tools.readthedocs.io.
 
@@ -28,7 +25,9 @@ Python Boilerplate contains all the boilerplate you need to create a Python pack
 Features
 --------
 
-* TODO
+* the `products` module offers full standard path creations for all HiRISE products.
+* the `downloads` module offers helpers to download HiRISE full and browse products
+* for Mac only, a command-line tool called 'abrowse' is installed that downloads and opens annotated browse products in the Preview.app
 
 Credits
 ---------
