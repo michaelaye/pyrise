@@ -192,10 +192,17 @@ class PRODUCT_ID(object):
     def label_path(self):
         return 'RDR/' + self.storage_stem + '.LBL'
 
-    @property
-    def label_url(self):
-        hiurl = HiRISE_URL(self.label_path)
-        return hiurl.url
+    def _make_url(self, obj):
+        path = getattr(self, f"{obj}_path")
+        return HiRISE_URL(path).url
+
+    def __getattr__(self, item):
+        tokens = item.split('_')
+        try:
+            if tokens[-1] == 'url':
+                return self._make_url('_'.join(tokens[:-1]))
+        except IndexError:
+            raise ValueError(f"No attribute named '{item}' found.")
 
     # TODO: implement general self.obj_url for all paths.
 
