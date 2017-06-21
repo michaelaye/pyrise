@@ -2,6 +2,10 @@
 hirise_tools
 ===============================
 
+.. image:: https://badges.gitter.im/hirise_tools/Lobby.svg
+   :alt: Join the chat at https://gitter.im/hirise_tools/Lobby
+   :target: https://gitter.im/hirise_tools/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
+
 
 .. image:: https://img.shields.io/pypi/v/hirise_tools.svg
         :target: https://pypi.python.org/pypi/hirise_tools
