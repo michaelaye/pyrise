@@ -1,4 +1,5 @@
 sphinx
 sphinxcontrib-napoleon
+sphinxcontrib
 sphinx-py3doc-enhanced-theme
--e .
+sphinxcontrib-bibtex
