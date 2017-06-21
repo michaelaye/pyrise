@@ -1,5 +1,0 @@
-hirise
-======
-
-.. automodule:: hirise
-    :members:
