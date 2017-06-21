@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import pvl
 
-from .hirise_tools import hirise_dropbox
+from .downloads import hirise_dropbox
 
 
 def get_rdr_index_names():
