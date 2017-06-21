@@ -40,7 +40,18 @@ import hirise_tools
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.viewcode']
+extensions = [
+    'sphinx.ext.autodoc',
+    'sphinx.ext.napoleon',
+    'sphinx.ext.doctest',
+    'sphinx.ext.todo',
+    'sphinx.ext.coverage',
+    'sphinx.ext.mathjax',
+    'sphinx.ext.viewcode',
+    'sphinxcontrib.bibtex',
+    'nbsphinx',
+    'IPython.sphinxext.ipython_console_highlighting'
+]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -57,6 +68,7 @@ master_doc = 'index'
 # General information about the project.
 project = u'hirise-tools'
 copyright = u"2016, K.-Michael Aye"
+author = 'K.-Michael Aye'
 
 # The version info for the project you're documenting, acts as replacement
 # for |version| and |release|, also used in various other places throughout
@@ -79,7 +91,8 @@ release = hirise_tools.__version__
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns = ['_build']
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store',
+                    '**.ipynb_checkpoints']
 
 # The reST default role (used for this markup: `text`) to use for all
 # documents.
@@ -106,12 +119,15 @@ pygments_style = 'sphinx'
 # documents.
 #keep_warnings = False
 
+# If true, `todo` and `todoList` produce output, else they produce nothing.
+todo_include_todos = True
+
 
 # -- Options for HTML output -------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'default'
+html_theme = 'alabaster'
 
 # Theme options are theme-specific and customize the look and feel of a
 # theme further.  For a list of options available for each theme, see the
@@ -241,7 +257,7 @@ latex_documents = [
 man_pages = [
     ('index', 'hirise_tools',
      u'hirise-tools Documentation',
-     [u'K.-Michael Aye'], 1)
+     [author], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -256,9 +272,9 @@ man_pages = [
 texinfo_documents = [
     ('index', 'hirise_tools',
      u'hirise-tools Documentation',
-     u'K.-Michael Aye',
+     author,
      'hirise_tools',
-     'One line description of project.',
+     'Tools for working with MRO HiRISE data.',
      'Miscellaneous'),
 ]
 

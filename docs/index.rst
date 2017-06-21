@@ -10,7 +10,10 @@ Contents:
    installation
    usage
    contributing
-   authorshistory
+   authors
+   history
+   changelog
+   modules
 
 Indices and tables
 ==================
