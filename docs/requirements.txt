@@ -1,4 +1,4 @@
-sphinx
+sphinx==1.6.2
 sphinxcontrib-napoleon
 sphinx-py3doc-enhanced-theme
 sphinxcontrib-bibtex
