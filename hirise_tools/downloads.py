@@ -2,12 +2,18 @@ import subprocess
 from pathlib import Path
 
 import click
-from pptx import Presentation
 from scipy.misc import imread
 from six.moves.urllib.error import HTTPError
 from six.moves.urllib.request import urlretrieve
 
 from .products import PRODUCT_ID, RED_PRODUCT_ID, HiRISE_URL
+
+try:
+    from pptx import Presentation
+except ImportError:
+    PPTX_INSTALLED = False
+else:
+    PPTX_INSTALLED = True
 
 
 def hirise_dropbox():
@@ -177,6 +183,9 @@ def get_and_display_browse_product(obsid):
 
 
 def create_browse_presentation(obsids, savename='obsid_browse_images', **kwargs):
+    if not PPTX_INSTALLED:
+        print("You need to install the `pptx` module for this to work.")
+        return
     savepath = str(savename) + '.pptx'
     prs = Presentation()
 
