@@ -144,21 +144,13 @@ class PRODUCT_ID(object):
     def __init__(self, initstr=None):
         if initstr is not None:
             tokens = initstr.split('_')
-            self._obsid = OBSERVATION_ID('_'.join(tokens[:3]))
+            self.obsid = OBSERVATION_ID('_'.join(tokens[:3]))
             try:
                 self.kind = tokens[3]
             except IndexError:
                 self._kind = None
         else:
             self._kind = None
-
-    @property
-    def obsid(self):
-        return self._obsid
-
-    @obsid.setter
-    def obsid(self, value):
-        self._obsid = OBSERVATION_ID(value)
 
     @property
     def kind(self):
@@ -192,17 +184,10 @@ class PRODUCT_ID(object):
     def label_path(self):
         return 'RDR/' + self.storage_stem + '.LBL'
 
-    def _make_url(self, obj):
-        path = getattr(self, f"{obj}_path")
-        return HiRISE_URL(path).url
-
-    def __getattr__(self, item):
-        tokens = item.split('_')
-        try:
-            if tokens[-1] == 'url':
-                return self._make_url('_'.join(tokens[:-1]))
-        except IndexError:
-            raise ValueError(f"No attribute named '{item}' found.")
+    @property
+    def label_url(self):
+        hiurl = HiRISE_URL(self.label_path)
+        return hiurl.url
 
     # TODO: implement general self.obj_url for all paths.
 
