@@ -1,24 +1,24 @@
 ===============================
-hirise_tools
+pyrise
 ===============================
 
-.. image:: https://badges.gitter.im/hirise_tools/Lobby.svg
-   :alt: Join the chat at https://gitter.im/hirise_tools/Lobby
-   :target: https://gitter.im/hirise_tools/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
+.. image:: https://badges.gitter.im/pyrise/Lobby.svg
+   :alt: Join the chat at https://gitter.im/pyrise/Lobby
+   :target: https://gitter.im/pyrise/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
 
 
-.. image:: https://img.shields.io/pypi/v/hirise_tools.svg
-        :target: https://pypi.python.org/pypi/hirise_tools
+.. image:: https://img.shields.io/pypi/v/pyrise.svg
+        :target: https://pypi.python.org/pypi/pyrise
 
-.. image:: https://img.shields.io/travis/michaelaye/hirise_tools.svg
-        :target: https://travis-ci.org/michaelaye/hirise_tools
+.. image:: https://img.shields.io/travis/michaelaye/pyrise.svg
+        :target: https://travis-ci.org/michaelaye/pyrise
 
 .. image:: https://readthedocs.org/projects/hirise-tools/badge/?version=latest
         :target: https://hirise-tools.readthedocs.io/en/latest/?badge=latest
         :alt: Documentation Status
 
-.. image:: https://pyup.io/repos/github/michaelaye/hirise_tools/shield.svg
-     :target: https://pyup.io/repos/github/michaelaye/hirise_tools/
+.. image:: https://pyup.io/repos/github/michaelaye/pyrise/shield.svg
+     :target: https://pyup.io/repos/github/michaelaye/pyrise/
      :alt: Updates
 
 

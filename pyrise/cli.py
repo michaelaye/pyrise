@@ -5,9 +5,9 @@ import click
 
 @click.command()
 def main(args=None):
-    """Console script for hirise_tools"""
+    """Console script for pyrise"""
     click.echo("Replace this message by putting your code into "
-               "hirise_tools.cli.main")
+               "pyrise.cli.main")
     click.echo("See click documentation at http://click.pocoo.org/")
 
 

@@ -12,9 +12,9 @@ To install hirise-tools, run this command in your terminal:
 
 .. code-block:: console
 
-    $ pip install hirise_tools
+    $ pip install pyrise
 
-This is the preferred method to install hirise-tools, as it will always install the most recent stable release. 
+This is the preferred method to install hirise-tools, as it will always install the most recent stable release.
 
 If you don't have `pip`_ installed, this `Python installation guide`_ can guide
 you through the process.
@@ -32,13 +32,13 @@ You can either clone the public repository:
 
 .. code-block:: console
 
-    $ git clone git://github.com/michaelaye/hirise_tools
+    $ git clone git://github.com/michaelaye/pyrise
 
 Or download the `tarball`_:
 
 .. code-block:: console
 
-    $ curl  -OL https://github.com/michaelaye/hirise_tools/tarball/master
+    $ curl  -OL https://github.com/michaelaye/pyrise/tarball/master
 
 Once you have a copy of the source, you can install it with:
 
@@ -47,5 +47,5 @@ Once you have a copy of the source, you can install it with:
     $ python setup.py install
 
 
-.. _Github repo: https://github.com/michaelaye/hirise_tools
-.. _tarball: https://github.com/michaelaye/hirise_tools/tarball/master
+.. _Github repo: https://github.com/michaelaye/pyrise
+.. _tarball: https://github.com/michaelaye/pyrise/tarball/master

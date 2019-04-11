@@ -8,7 +8,7 @@ from .downloads import hirise_dropbox
 
 def get_rdr_index_names():
     lblfile = hirise_dropbox() / 'RDRCUMINDEX.LBL'
-    label = pvl.load(lblfile)
+    label = pvl.load(str(lblfile))
     table = label['RDR_INDEX_TABLE']
     names = []
     for item in table:

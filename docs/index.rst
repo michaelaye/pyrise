@@ -1,4 +1,4 @@
-Welcome to the documentation of the hirise_tools package!
+Welcome to the documentation of the pyrise package!
 =========================================================
 
 Contents:

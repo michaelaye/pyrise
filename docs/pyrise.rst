@@ -7,7 +7,7 @@ Submodules
 hirise\_tools\.cli module
 -------------------------
 
-.. automodule:: hirise_tools.cli
+.. automodule:: pyrise.cli
     :members:
     :undoc-members:
     :show-inheritance:
@@ -15,7 +15,7 @@ hirise\_tools\.cli module
 hirise\_tools\.data module
 --------------------------
 
-.. automodule:: hirise_tools.data
+.. automodule:: pyrise.data
     :members:
     :undoc-members:
     :show-inheritance:
@@ -23,7 +23,7 @@ hirise\_tools\.data module
 hirise\_tools\.downloads module
 -------------------------------
 
-.. automodule:: hirise_tools.downloads
+.. automodule:: pyrise.downloads
     :members:
     :undoc-members:
     :show-inheritance:
@@ -31,7 +31,7 @@ hirise\_tools\.downloads module
 hirise\_tools\.indexfiles module
 --------------------------------
 
-.. automodule:: hirise_tools.indexfiles
+.. automodule:: pyrise.indexfiles
     :members:
     :undoc-members:
     :show-inheritance:
@@ -39,7 +39,7 @@ hirise\_tools\.indexfiles module
 hirise\_tools\.labels module
 ----------------------------
 
-.. automodule:: hirise_tools.labels
+.. automodule:: pyrise.labels
     :members:
     :undoc-members:
     :show-inheritance:
@@ -47,7 +47,7 @@ hirise\_tools\.labels module
 hirise\_tools\.products module
 ------------------------------
 
-.. automodule:: hirise_tools.products
+.. automodule:: pyrise.products
     :members:
     :undoc-members:
     :show-inheritance:
@@ -56,7 +56,7 @@ hirise\_tools\.products module
 Module contents
 ---------------
 
-.. automodule:: hirise_tools
+.. automodule:: pyrise
     :members:
     :undoc-members:
     :show-inheritance:

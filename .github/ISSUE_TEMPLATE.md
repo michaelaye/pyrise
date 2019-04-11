@@ -1,4 +1,4 @@
-* hirise_tools version:
+* pyrise version:
 * Python version:
 * Operating System:
 

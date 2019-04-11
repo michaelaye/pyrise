@@ -20,22 +20,22 @@ test_requirements = [
 
 
 setup(
-    name='hirise_tools',
+    name='pyrise',
     version='0.5.1',
     description="Tools to work with MRO's HiRISE camera data.",
     long_description=readme + '\n\n' + history,
     author='K.-Michael Aye',
     author_email='kmichael.aye@gmail.com',
-    url='https://github.com/michaelaye/hirise_tools',
+    url='https://github.com/michaelaye/pyrise',
     packages=[
-        'hirise_tools',
+        'pyrise',
     ],
-    package_dir={'hirise_tools':
-                 'hirise_tools'},
+    package_dir={'pyrise':
+                 'pyrise'},
     entry_points={
         'console_scripts': [
-            'hirise_tools = hirise_tools.cli:main',
-            'abrowse = hirise_tools.downloads:get_and_display_browse_product',
+            'pyrise = pyrise.cli:main',
+            'abrowse = pyrise.downloads:get_and_display_browse_product',
         ]
     },
     include_package_data=True,

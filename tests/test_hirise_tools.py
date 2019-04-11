@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 
 """
-test_hirise_tools
+test_pyrise
 ----------------------------------
 
-Tests for `hirise_tools` module.
+Tests for `pyrise` module.
 """
 
 import pytest
@@ -13,8 +13,8 @@ import pytest
 from contextlib import contextmanager
 from click.testing import CliRunner
 
-import hirise_tools
-from hirise_tools import cli
+import pyrise
+from pyrise import cli
 
 
 @pytest.fixture
@@ -35,7 +35,7 @@ def test_command_line_interface():
     runner = CliRunner()
     result = runner.invoke(cli.main)
     assert result.exit_code == 0
-    assert 'hirise_tools.cli.main' in result.output
+    assert 'pyrise.cli.main' in result.output
     help_result = runner.invoke(cli.main, ['--help'])
     assert help_result.exit_code == 0
     assert '--help  Show this message and exit.' in help_result.output

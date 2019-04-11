@@ -1,7 +1,7 @@
-hirise_tools
+pyrise
 ============
 
 .. toctree::
    :maxdepth: 4
 
-   hirise_tools
+   pyrise

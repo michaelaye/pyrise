@@ -7,16 +7,16 @@ General
 
 To use hirise-tools in a project::
 
-    import hirise_tools
-    
+    import pyrise
+
 or
 
-    import hirise_tools as ht
-    
+    import pyrise as ht
+
 `products`
 ----------
 
-    from hirise_tools import products
-    
+    from pyrise import products
+
     obsid = products.OBS
-    
+
