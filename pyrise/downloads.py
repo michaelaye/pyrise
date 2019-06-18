@@ -2,7 +2,7 @@ import subprocess
 from pathlib import Path
 
 import click
-from scipy.misc import imread
+from imageio import imread
 from six.moves.urllib.error import HTTPError
 from six.moves.urllib.request import urlretrieve
 
