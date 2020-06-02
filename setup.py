@@ -21,7 +21,7 @@ test_requirements = [
 
 setup(
     name="hirise_tools",
-    version="version='0.7.2'",
+    version="version='0.7.3'",
     description="Tools to work with MRO's HiRISE camera data.",
     long_description=readme + "\n\n" + history,
     author="K.-Michael Aye",
