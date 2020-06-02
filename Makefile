@@ -45,6 +45,7 @@ clean-pyc: ## remove Python file artifacts
 clean-test: ## remove test and coverage artifacts
 	rm -f .coverage
 	rm -fr htmlcov/
+	rm -fr .pytest_cache
 
 lint: ## check style with flake8
 	flake8 pyrise tests
@@ -54,11 +55,10 @@ test: ## run tests quickly with the default Python
 
 
 coverage: ## check code coverage quickly with the default Python
-	coverage run --source pyrise py.test
-
-		coverage report -m
-		coverage html
-		$(BROWSER) htmlcov/index.html
+	coverage run --source pyrise -m pytest
+	coverage report -m
+	coverage html
+	$(BROWSER) htmlcov/index.html
 
 docs: ## generate Sphinx HTML documentation, including API docs
 	rm -f docs/pyrise.rst
@@ -71,9 +71,8 @@ docs: ## generate Sphinx HTML documentation, including API docs
 servedocs: docs ## compile the docs watching for changes
 	watchmedo shell-command -p '*.rst' -c '$(MAKE) -C docs html' -R -D .
 
-release: clean ## package and upload a release
-	python setup.py sdist upload
-	python setup.py bdist_wheel upload
+release: dist ## package and upload a release
+	twine upload dist/*
 
 dist: clean ## builds source and wheel package
 	python setup.py sdist
@@ -81,4 +80,7 @@ dist: clean ## builds source and wheel package
 	ls -l dist
 
 install: clean ## install the package to the active Python's site-packages
-	python setup.py install
+	pip install .
+
+devinstall: clean
+	pip install -e .
